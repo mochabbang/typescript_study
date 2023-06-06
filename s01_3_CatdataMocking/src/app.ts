@@ -1,43 +1,64 @@
 import * as express from 'express';
 import catsRouter from './cats/cats.route';
 
-const app: express.Express = express();
+class Server {
+    public app: express.Application;
 
-// 미들웨어!
-//   순서가 중요하다.
-//   로깅이나 특정 작업을 진행할 때 사용하게 된다.
+    constructor() {
+        const app: express.Application = express();
+        this.app = app;
+    }
 
-//   use 함수는 전체적으로 사용하기 위함
-app.use(
-    (
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction,
-    ) => {
-        console.log(req.rawHeaders[1]);
-        console.log('this is loggin middleware');
+    private setRoute() {
+        // cats에 대한 라우터 설정 미들웨어
+        this.app.use(catsRouter);
+    }
 
-        next();
-    },
-);
+    private setMiddleware() {
+        //   use 함수는 전체적으로 사용하기 위함
+        this.app.use(
+            (
+                req: express.Request,
+                res: express.Response,
+                next: express.NextFunction,
+            ) => {
+                console.log(req.rawHeaders[1]);
+                console.log('this is loggin middleware');
 
-// json을 읽는 미들웨어 구서성
-app.use(express.json());
+                next();
+            },
+        );
 
-// cats에 대한 라우터 설정 미들웨어
-app.use(catsRouter);
+        // json을 읽는 미들웨어 구서성
+        this.app.use(express.json());
 
-// 존재하지 않는 URL 미들웨어
-app.use(
-    (
-        req: express.Request,
-        res: express.Response,
-        next: express.NextFunction,
-    ) => {
-        res.send({ error: '404 not found error' });
-    },
-);
+        // cats에 대한 라우터 설정 미들웨어
+        this.setRoute();
 
-app.listen(8000, () => {
-    console.log('server is on...');
-});
+        // 존재하지 않는 URL 미들웨어
+        this.app.use(
+            (
+                req: express.Request,
+                res: express.Response,
+                next: express.NextFunction,
+            ) => {
+                res.send({ error: '404 not found error' });
+            },
+        );
+    }
+
+    public listen() {
+        this.setMiddleware();
+
+        this.app.listen(8000, () => {
+            console.log('server is on...');
+        });
+    }
+}
+
+function init() {
+    const server = new Server();
+    server.listen();
+}
+
+init();

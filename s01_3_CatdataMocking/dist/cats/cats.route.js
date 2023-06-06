@@ -1,62 +1,13 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var cats_model_1 = require("./cats.model");
 var express_1 = require("express");
+var cats_service_1 = require("./cats.service");
 var router = (0, express_1.Router)();
-router.get('/cats', function (req, res) {
-    try {
-        var cats = cats_model_1.Cat;
-        res.status(200).send({
-            success: true,
-            data: {
-                cats: cats,
-            },
-        });
-    }
-    catch (error) {
-        res.status(500).send({
-            success: false,
-            error: error.message,
-        });
-    }
-});
-router.get('/cats/:id', function (req, res) {
-    try {
-        var params_1 = req.params;
-        console.log(params_1);
-        var r_cat = cats_model_1.Cat.find(function (cat) {
-            return cat.id == params_1.id;
-        });
-        res.status(200).send({
-            success: true,
-            data: {
-                r_cat: r_cat,
-            },
-        });
-    }
-    catch (error) {
-        res.status(500).send({
-            success: false,
-            error: error.message,
-        });
-    }
-});
-router.post('/cats', function (req, res) {
-    try {
-        var data = req.body;
-        console.log(data);
-        cats_model_1.Cat.push(data);
-        res.status(200).send({
-            success: true,
-            data: { data: data },
-        });
-    }
-    catch (error) {
-        res.status(500).send({
-            success: false,
-            error: error.message,
-        });
-    }
-});
+router.get('/cats', cats_service_1.readAllcat);
+router.get('/cats/:id', cats_service_1.readCat);
+router.post('/cats', cats_service_1.createCat);
+router.put('/cats/:id', cats_service_1.putCat);
+router.patch('/cats/:id', cats_service_1.patchCat);
+router.delete('/cats/:id', cats_service_1.deleteCat);
 exports.default = router;
 //# sourceMappingURL=cats.route.js.map
